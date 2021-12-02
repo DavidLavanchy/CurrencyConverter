@@ -24,7 +24,7 @@ namespace CurrencyConverter
     /// </summary>
     public partial class MainWindow : Window
     {
-        Root val = new Root();
+        Root root = new Root();
 
         public class Root
         {
@@ -51,12 +51,12 @@ namespace CurrencyConverter
         {
             InitializeComponent();
             ClearControls();
-            BindCurrency();
+            GetValue();
         }
 
         private async void GetValue()
         {
-            val = await GetData<Root>("https://openexchangerates.org/api/latest.json?app_id=271f8075c38c4660b96d9cad1d5acee4");
+            root = await GetData<Root>("https://openexchangerates.org/api/latest.json?app_id=271f8075c38c4660b96d9cad1d5acee4");
             BindCurrency();
         }
 
@@ -74,7 +74,7 @@ namespace CurrencyConverter
                         var ResponseString = await response.Content.ReadAsStringAsync();
                         var ResponseObject = JsonConvert.DeserializeObject<Root>(ResponseString);
 
-                        MessageBox.Show("Timestamp: " + ResponseObject.timestamp, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        //MessageBox.Show("License: " + ResponseObject.license, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
 
                         return ResponseObject;
                     }
@@ -106,13 +106,18 @@ namespace CurrencyConverter
             dtCurrency.Columns.Add("Value");
 
             dtCurrency.Rows.Add("--SELECT--", 0);
-            dtCurrency.Rows.Add("INR", 1);
-            dtCurrency.Rows.Add("USD", 75);
-            dtCurrency.Rows.Add("EUR", 85);
-            dtCurrency.Rows.Add("SAR", 20);
-            dtCurrency.Rows.Add("POUND", 5);
-            dtCurrency.Rows.Add("DEM", 43);
+            dtCurrency.Rows.Add("INR", root.Rates.INR);
+            dtCurrency.Rows.Add("JPY", root.Rates.JPY);
+            dtCurrency.Rows.Add("USD", root.Rates.USD);
+            dtCurrency.Rows.Add("NZD", root.Rates.NZD);
+            dtCurrency.Rows.Add("EUR", root.Rates.EUR);
+            dtCurrency.Rows.Add("CAD", root.Rates.CAD);
+            dtCurrency.Rows.Add("ISK", root.Rates.ISK);
+            dtCurrency.Rows.Add("PHP", root.Rates.PHP);
+            dtCurrency.Rows.Add("DKK", root.Rates.DKK);
+            dtCurrency.Rows.Add("CZK", root.Rates.CZK);
 
+            
             cmbFromCurrency.ItemsSource = dtCurrency.DefaultView;
             cmbFromCurrency.DisplayMemberPath = "Text";
             cmbFromCurrency.SelectedValuePath = "Value";
@@ -160,7 +165,7 @@ namespace CurrencyConverter
             }
             else
             {
-                ConvertedValue = (double.Parse(cmbFromCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbToCurrency.SelectedValue.ToString());
+                ConvertedValue = (double.Parse(cmbToCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbFromCurrency.SelectedValue.ToString());
 
                 lblCurrency.Content = cmbToCurrency.Text + " " + ConvertedValue.ToString("N3");
             }
