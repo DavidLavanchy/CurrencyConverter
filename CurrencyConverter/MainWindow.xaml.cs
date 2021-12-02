@@ -24,7 +24,13 @@ namespace CurrencyConverter
         public MainWindow()
         {
             InitializeComponent();
+            ClearControls();
             BindCurrency();
+        }
+
+        private void ClearControls()
+        {
+            
         }
 
         private void BindCurrency()
@@ -45,11 +51,53 @@ namespace CurrencyConverter
             cmbFromCurrency.DisplayMemberPath = "Text";
             cmbFromCurrency.SelectedValuePath = "Value";
             cmbFromCurrency.SelectedIndex = 0;
+
+            cmbToCurrency.ItemsSource = dtCurrency.DefaultView;
+            cmbToCurrency.DisplayMemberPath = "Text";
+            cmbToCurrency.SelectedValuePath = "Value";
+            cmbToCurrency.SelectedIndex = 0;
         }
 
         private void Convert_Click(object sender, RoutedEventArgs e)
         {
+            double ConvertedValue;
 
+            if (txtCurrency.Text == null || txtCurrency.Text.Trim() == "")
+            {
+                MessageBox.Show("Please Enter Currency", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                txtCurrency.Focus();
+                return;
+            }
+
+            else if (cmbFromCurrency.SelectedValue == null || cmbFromCurrency.SelectedIndex == 0)
+            {
+                MessageBox.Show("Please Select Currency From", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                cmbFromCurrency.Focus();
+                return;
+            }
+
+            else if (cmbToCurrency.SelectedValue == null || cmbToCurrency.SelectedIndex == 0)
+            {
+                MessageBox.Show("Please Select Currency To", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                cmbToCurrency.Focus();
+                return;
+            }
+
+            if (cmbFromCurrency.Text == cmbToCurrency.Text)
+            {
+
+                ConvertedValue = double.Parse(txtCurrency.Text);
+
+                lblCurrency.Content = cmbToCurrency.Text + " " + ConvertedValue.ToString("N3");
+            }
+            else
+            {
+                ConvertedValue = (double.Parse(cmbFromCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbToCurrency.SelectedValue.ToString());
+
+                lblCurrency.Content = cmbToCurrency.Text + " " + ConvertedValue.ToString("N3");
+            }
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)
