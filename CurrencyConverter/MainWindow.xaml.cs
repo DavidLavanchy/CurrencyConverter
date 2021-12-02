@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 
 namespace CurrencyConverter
 {
@@ -22,11 +24,68 @@ namespace CurrencyConverter
     /// </summary>
     public partial class MainWindow : Window
     {
+        Root val = new Root();
+
+        public class Root
+        {
+            public Rate Rates { get; set; }
+            public long timestamp;
+            public string license;
+        }
+
+        public class Rate
+        {
+            public double INR { get; set; }
+            public double JPY { get; set; }
+            public double USD { get; set; }
+            public double NZD { get; set; }
+            public double EUR { get; set; }
+            public double CAD { get; set; }
+            public double ISK { get; set; }
+            public double PHP { get; set; }
+            public double DKK { get; set; }
+            public double CZK { get; set; }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             ClearControls();
             BindCurrency();
+        }
+
+        private async void GetValue()
+        {
+            val = await GetData<Root>("https://openexchangerates.org/api/latest.json?app_id=271f8075c38c4660b96d9cad1d5acee4");
+            BindCurrency();
+        }
+
+        public static async Task<Root> GetData<T>(string url)
+        {
+            var myRoot = new Root();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromMinutes(1);
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var ResponseString = await response.Content.ReadAsStringAsync();
+                        var ResponseObject = JsonConvert.DeserializeObject<Root>(ResponseString);
+
+                        MessageBox.Show("Timestamp: " + ResponseObject.timestamp, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        return ResponseObject;
+                    }
+
+                    return myRoot;
+                }
+            }
+            catch
+            {
+                return myRoot;
+            }
         }
 
         private void ClearControls()
