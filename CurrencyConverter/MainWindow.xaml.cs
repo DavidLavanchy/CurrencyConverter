@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,7 +31,13 @@ namespace CurrencyConverter
 
         private void ClearControls()
         {
-            
+            txtCurrency.Text = string.Empty;
+            if (cmbFromCurrency.Items.Count > 0)
+                cmbFromCurrency.SelectedIndex = 0;
+            if (cmbToCurrency.Items.Count > 0)
+                cmbToCurrency.SelectedIndex = 0;
+            lblCurrency.Content = "";
+            txtCurrency.Focus();
         }
 
         private void BindCurrency()
@@ -107,7 +114,8 @@ namespace CurrencyConverter
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
     }
 }
