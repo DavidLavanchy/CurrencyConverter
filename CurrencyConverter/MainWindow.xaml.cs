@@ -109,7 +109,7 @@ namespace CurrencyConverter
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-
+            ClearControls();
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
